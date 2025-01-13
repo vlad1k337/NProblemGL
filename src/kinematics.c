@@ -48,9 +48,7 @@ void initialConditionsSquare(KinematicBodies* bodies, const float min_boundary, 
         bodies->positions[i][1] = (float)rand()/(float)RAND_MAX * (max_boundary - min_boundary) + min_boundary;
         bodies->positions[i][2] = (float)rand()/(float)RAND_MAX * (max_boundary - min_boundary) + min_boundary;
 
-        bodies->velocities[i][0] = (float)rand()/(float)RAND_MAX - 1.0;
-        bodies->velocities[i][1] = (float)rand()/(float)RAND_MAX - 1.0;
-        bodies->velocities[i][2] = (float)rand()/(float)RAND_MAX - 1.0;
+		glm_vec3_zero(bodies->velocities[i]);
 
         bodies->masses[i] = (float)rand()/(float)RAND_MAX;
 	}
@@ -66,7 +64,7 @@ void initialConditionsBigBang(KinematicBodies* bodies, vec3 center, float radius
 
     for(unsigned int i = 1, pos = 0; i < bodies->count; ++i, pos += 3)
     {
-        float phi = rand() * M_PI;
+        float phi   = rand() * M_PI;
         float theta = rand() * M_PI * 2.0;
 
         bodies->positions[i][0] = center[0] + radius * sin(phi) * cos(theta);
@@ -75,7 +73,7 @@ void initialConditionsBigBang(KinematicBodies* bodies, vec3 center, float radius
 
         glm_vec3_zero(bodies->velocities[i]);
 
-        bodies->masses[i] = 0.001;
+        bodies->masses[i] = 0.0;
 	}
 }
 
@@ -87,15 +85,16 @@ void initialConditionsDisk(KinematicBodies* bodies, vec3 center, float radius, f
 
     for(unsigned int i = 1; i < bodies->count; ++i)
     {
-        float phi = rand() * M_PI;
+        float phi = rand() * 2 * M_PI;
         float r   = (float)rand()/(float)RAND_MAX;
 
         bodies->positions[i][0] = center[1] + r * radius * sin(phi) * scale;
         bodies->positions[i][1] = center[2] * scale;
         bodies->positions[i][2] = center[0] + r * radius * cos(phi) * scale;
 
-        glm_vec3_zero(bodies->velocities[i]);
-        bodies->masses[i] = 0.001;
+		glm_vec3_zero(bodies->velocities[i]);
+
+        bodies->masses[i] = 0.0;
     }
 }
 
@@ -111,17 +110,16 @@ void simulateGravitational(KinematicBodies* bodies, float dt)
             if(i != j)
             {
                 float dist = glm_vec3_distance(bodies->positions[j], bodies->positions[i]);
-                float field = BIG_G * (bodies->masses[j]) / (dist * dist + epsilon * epsilon);
+                float field = BIG_G * (bodies->masses[j]) / pow(dist * dist + epsilon * epsilon, 1.5);
 
                 vec3 displacement;
                 glm_vec3_sub(bodies->positions[j], bodies->positions[i], displacement);
-				glm_vec3_normalize(displacement);
                 glm_vec3_muladds(displacement, field, acceleration);
             }
         }
         glm_vec3_muladds(acceleration, dt * 0.5, bodies->velocities[i]);
         glm_vec3_muladds(bodies->velocities[i], dt, bodies->positions[i]);
-        glm_vec3_muladds(acceleration, dt * 0.5, bodies->velocities[i]);
+		glm_vec3_muladds(acceleration, dt * 0.5, bodies->velocities[i]);
     }
 }
 

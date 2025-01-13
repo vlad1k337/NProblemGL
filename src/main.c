@@ -16,7 +16,7 @@ int main()
 	glCullFace(GL_BACK);
 
 	Camera* camera = createCamera();
-	float cam_pos[3] = {0.0, 0.0, 100.0};
+	float cam_pos[3] = {0.0, 100.0, 100.0};
 	setPosition(camera, cam_pos);
 
 	GLuint vertex   = compileShader("shaders/vertex.glsl", GL_VERTEX_SHADER);
@@ -33,7 +33,7 @@ int main()
 	float masses[3] = {10.0, 0.0, 0.0};
 	vec3 center;
 	glm_vec3_zero(center);
-	initialConditionsBigBang(bodies, center, 70.0);
+	initialConditionsDisk(bodies, center, 100.0, 2.0);
 
 	SphereRenderer* renderer = createSpheresRenderer(shader, &sphere->mesh, bodies->count);
 
